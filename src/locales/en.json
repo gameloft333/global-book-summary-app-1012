@@ -1,0 +1,10 @@
+{
+  "appTitle": "Global Book Summary Generator",
+  "enterBookName": "Enter book name",
+  "generateSummary": "Generate Summary",
+  "generating": "Generating...",
+  "chineseVersion": "Chinese Version",
+  "englishVersion": "English Version",
+  "pleaseEnterBookName": "Please enter a book name",
+  "failedToGenerateSummary": "Failed to generate summary. Please try again."
+}

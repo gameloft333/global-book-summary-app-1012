@@ -1,0 +1,10 @@
+{
+  "appTitle": "全球图书摘要生成器",
+  "enterBookName": "我想看的书是...",
+  "generateSummary": "帮我阅读",
+  "generating": "阅读分析中，请稍后...",
+  "chineseVersion": "中文摘要",
+  "englishVersion": "英文摘要",
+  "pleaseEnterBookName": "请输入书名",
+  "failedToGenerateSummary": "生成摘要失败，请重试。"
+}

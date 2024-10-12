@@ -1,0 +1,18 @@
+{
+  "version": "0.7.3",
+  "files": [
+    {
+      "path": "Dockerfile",
+      "description": "Updated to use npm run preview instead of serve"
+    },
+    {
+      "path": "package.json",
+      "description": "Updated preview script to use --host and --port options"
+    }
+  ],
+  "changes": [
+    "Modified Dockerfile to use npm run preview for serving the built application",
+    "Updated package.json to configure Vite preview to listen on all interfaces and port 3000",
+    "Updated version number to 0.7.3"
+  ]
+}
