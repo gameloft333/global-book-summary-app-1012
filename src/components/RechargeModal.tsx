@@ -14,36 +14,32 @@ interface RechargeModalProps {
 const RechargeModal: React.FC<RechargeModalProps> = ({ isOpen, onClose, dailyUsage, onRecharge }) => {
   const { t } = useTranslation();
   const [rechargeAmounts, setRechargeAmounts] = useState<DailyUsage>({
-    zhSummary: 1,
-    enSummary: 1,
-    zhAnalysis: 1,
-    enAnalysis: 1
+    zhSummary: config.minRechargeAmount,
+    enSummary: config.minRechargeAmount,
+    zhAnalysis: config.minRechargeAmount,
+    enAnalysis: config.minRechargeAmount
   });
 
   useEffect(() => {
-    // 重置充值金额为1，确保每次打开模态框时都有有效值
     setRechargeAmounts({
-      zhSummary: 1,
-      enSummary: 1,
-      zhAnalysis: 1,
-      enAnalysis: 1
+      zhSummary: config.minRechargeAmount,
+      enSummary: config.minRechargeAmount,
+      zhAnalysis: config.minRechargeAmount,
+      enAnalysis: config.minRechargeAmount
     });
   }, [isOpen]);
 
-  const handleAmountChange = (type: keyof DailyUsage, value: number | string) => {
-    let newValue = typeof value === 'string' ? parseInt(value, 10) : value;
-    
-    // 确保newValue是一个有效的数字
-    if (isNaN(newValue) || newValue < 1) {
-      newValue = 1;
-    } else if (newValue > config.rechargeOptions[type].maxRecharge) {
-      newValue = config.rechargeOptions[type].maxRecharge;
-    }
-
-    setRechargeAmounts(prev => ({
-      ...prev,
-      [type]: newValue
-    }));
+  const handleAmountChange = (type: keyof DailyUsage, increment: boolean) => {
+    setRechargeAmounts(prev => {
+      const currentAmount = prev[type];
+      let newAmount;
+      if (increment) {
+        newAmount = currentAmount + config.rechargeUnit;
+      } else {
+        newAmount = Math.max(config.minRechargeAmount, currentAmount - config.rechargeUnit);
+      }
+      return { ...prev, [type]: newAmount };
+    });
   };
 
   const calculatePrice = (type: keyof DailyUsage): number => {
@@ -73,27 +69,16 @@ const RechargeModal: React.FC<RechargeModalProps> = ({ isOpen, onClose, dailyUsa
               <div className="flex items-center justify-between">
                 <div className="flex items-center bg-white rounded-lg shadow-sm">
                   <button
-                    onClick={() => handleAmountChange(type as keyof DailyUsage, Math.max(1, rechargeAmounts[type as keyof DailyUsage] - 1))}
+                    onClick={() => handleAmountChange(type as keyof DailyUsage, false)}
                     className="p-2 text-gray-600 hover:text-gray-800 transition-colors"
                   >
                     <Minus className="w-5 h-5" />
                   </button>
-                  <input
-                    type="number"
-                    value={rechargeAmounts[type as keyof DailyUsage]}
-                    onChange={(e) => handleAmountChange(type as keyof DailyUsage, e.target.value)}
-                    onBlur={(e) => {
-                      const value = parseInt(e.target.value, 10);
-                      if (isNaN(value) || value < 1) {
-                        handleAmountChange(type as keyof DailyUsage, 1);
-                      }
-                    }}
-                    className="w-16 text-center text-xl font-semibold border-none focus:ring-0"
-                    min="1"
-                    max={option.maxRecharge}
-                  />
+                  <span className="w-16 text-center text-xl font-semibold">
+                    {rechargeAmounts[type as keyof DailyUsage]}
+                  </span>
                   <button
-                    onClick={() => handleAmountChange(type as keyof DailyUsage, Math.min(option.maxRecharge, rechargeAmounts[type as keyof DailyUsage] + 1))}
+                    onClick={() => handleAmountChange(type as keyof DailyUsage, true)}
                     className="p-2 text-gray-600 hover:text-gray-800 transition-colors"
                   >
                     <Plus className="w-5 h-5" />

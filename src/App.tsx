@@ -4,13 +4,14 @@ import { generateBookSummary } from './services/geminiService';
 import { generateBookAnalysis } from './services/kimiService';
 import QRCode from 'qrcode.react';
 import config from './config';
-import { Book, AlertCircle, Settings, CreditCard } from 'lucide-react';
+import { Book, AlertCircle, Settings, CreditCard, HelpCircle } from 'lucide-react';
 import { generateUserId } from './services/userIdService';
 import { DailyUsage, PaymentMethod } from './types';
 import PaymentModal from './components/PaymentModal';
 import AdminPanel from './components/AdminPanel';
 import { getUserData, updateUserUsage, rechargeUserUsage } from './services/userService';
 import RechargeModal from './components/RechargeModal';
+import HelpModal from './components/HelpModal';
 
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -23,16 +24,13 @@ const App: React.FC = () => {
   const [qrValue, setQrValue] = useState('');
   const [language, setLanguage] = useState<'zh' | 'en'>('zh');
   const [themeColor, setThemeColor] = useState('');
-  const [userId, setUserId] = useState(() => {
-    return localStorage.getItem('userId') || generateUserId();
-  });
+  const [userId, setUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [dailyUsage, setDailyUsage] = useState<DailyUsage>(() => {
-    const storedUsage = localStorage.getItem('dailyUsage');
-    if (storedUsage) {
-      return JSON.parse(storedUsage);
-    }
-    return { ...config.dailyLimits };
+  const [dailyUsage, setDailyUsage] = useState<DailyUsage>({
+    zhSummary: 0,
+    enSummary: 0,
+    zhAnalysis: 0,
+    enAnalysis: 0
   });
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
@@ -40,23 +38,23 @@ const App: React.FC = () => {
   const [showRechargeModal, setShowRechargeModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [notification, setNotification] = useState<string | null>(null);
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
   useEffect(() => {
     const initializeUser = async () => {
       try {
         setIsLoading(true);
         const storedUserId = localStorage.getItem('userId');
+        let currentUserId;
         if (storedUserId) {
-          setUserId(storedUserId);
-          const userData = await getUserData(storedUserId);
-          setDailyUsage(userData.remainingUsage);
+          currentUserId = storedUserId;
         } else {
-          const newUserId = generateUserId();
-          setUserId(newUserId);
-          localStorage.setItem('userId', newUserId);
-          const userData = await getUserData(newUserId);
-          setDailyUsage(userData.remainingUsage);
+          currentUserId = generateUserId();
+          localStorage.setItem('userId', currentUserId);
         }
+        setUserId(currentUserId);
+        const userData = await getUserData(currentUserId);
+        setDailyUsage(userData.remainingUsage);
       } catch (error) {
         console.error('Error initializing user:', error);
         setError('Failed to initialize user data');
@@ -70,16 +68,22 @@ const App: React.FC = () => {
 
   useEffect(() => {
     setThemeColor(getRandomColor());
-    if (userId) {
-      localStorage.setItem('userId', userId);
-      const userData = getUserData(userId);
-      setDailyUsage(userData.remainingUsage);
-    }
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem('dailyUsage', JSON.stringify(dailyUsage));
-  }, [dailyUsage]);
+    const fetchLatestUserData = async () => {
+      if (userId) {
+        try {
+          const userData = await getUserData(userId);
+          setDailyUsage(userData.remainingUsage);
+        } catch (error) {
+          console.error('Error fetching latest user data:', error);
+        }
+      }
+    };
+
+    fetchLatestUserData();
+  }, [userId]);
 
   const getRandomColor = () => {
     const hue = Math.floor(Math.random() * 360);
@@ -88,7 +92,8 @@ const App: React.FC = () => {
 
   const handleGenerateSummary = async (lang: 'zh' | 'en') => {
     const usageType = lang === 'zh' ? 'zhSummary' : 'enSummary';
-    if (dailyUsage[usageType] <= 0) {
+    const pointsToDeduct = config.pointDeductions[usageType];
+    if (dailyUsage[usageType] < pointsToDeduct) {
       setShowRechargeModal(true);
       return;
     }
@@ -104,9 +109,9 @@ const App: React.FC = () => {
       const result = await generateBookSummary(bookName, lang);
       setSummary(result);
       setQrValue(result);
-      const updatedUsage = { ...dailyUsage, [usageType]: Math.max(0, dailyUsage[usageType] - 1) };
-      setDailyUsage(updatedUsage);
-      await updateUserUsage(userId, usageType);
+      await updateUserUsage(userId!, usageType, pointsToDeduct);
+      const updatedUserData = await getUserData(userId!);
+      setDailyUsage(updatedUserData.remainingUsage);
     } catch (error) {
       console.error('Error generating summary:', error);
       setError(t('failedToGenerateSummary') + ': ' + (error instanceof Error ? error.message : t('unknownError')));
@@ -118,7 +123,8 @@ const App: React.FC = () => {
 
   const handleGenerateAnalysis = async (lang: 'zh' | 'en') => {
     const usageType = lang === 'zh' ? 'zhAnalysis' : 'enAnalysis';
-    if (dailyUsage[usageType] <= 0) {
+    const pointsToDeduct = config.pointDeductions[usageType];
+    if (dailyUsage[usageType] < pointsToDeduct) {
       setShowRechargeModal(true);
       return;
     }
@@ -134,9 +140,9 @@ const App: React.FC = () => {
       const result = await generateBookAnalysis(bookName, lang);
       setSummary(result);
       setQrValue(result);
-      const updatedUsage = { ...dailyUsage, [usageType]: Math.max(0, dailyUsage[usageType] - 1) };
-      setDailyUsage(updatedUsage);
-      await updateUserUsage(userId, usageType);
+      await updateUserUsage(userId!, usageType, pointsToDeduct);
+      const updatedUserData = await getUserData(userId!);
+      setDailyUsage(updatedUserData.remainingUsage);
     } catch (error) {
       console.error('Error generating analysis:', error);
       setError(t('failedToGenerateAnalysis') + ': ' + (error instanceof Error ? error.message : t('unknownError')));
@@ -173,11 +179,17 @@ const App: React.FC = () => {
   };
 
   const handleRecharge = async (type: keyof DailyUsage, amount: number) => {
-    await rechargeUserUsage(userId, type, amount);
-    const updatedUserData = await getUserData(userId);
-    setDailyUsage(updatedUserData.remainingUsage);
-    setShowRechargeModal(false);
-    alert(t('rechargeSuccess', { type: t(type), amount }));
+    try {
+      if (!userId) throw new Error('User ID is not set');
+      await rechargeUserUsage(userId, type, amount);
+      const updatedUserData = await getUserData(userId);
+      setDailyUsage(updatedUserData.remainingUsage);
+      setShowRechargeModal(false);
+      alert(t('rechargeSuccess', { type: t(type), amount }));
+    } catch (error) {
+      console.error('Error recharging:', error);
+      alert('Failed to recharge. Please try again.');
+    }
   };
 
   if (isLoading) {
@@ -298,6 +310,12 @@ const App: React.FC = () => {
           >
             <CreditCard className="w-5 h-5" />
           </button>
+          <button
+            onClick={() => setShowHelpModal(true)}
+            className="text-gray-500 hover:text-gray-700 transition duration-300 ml-2"
+          >
+            <HelpCircle className="w-5 h-5" />
+          </button>
           <div 
             className="text-gray-500"
             style={{
@@ -328,6 +346,10 @@ const App: React.FC = () => {
         onClose={() => setShowRechargeModal(false)}
         dailyUsage={dailyUsage}
         onRecharge={handleRecharge}
+      />
+      <HelpModal
+        isOpen={showHelpModal}
+        onClose={() => setShowHelpModal(false)}
       />
     </div>
   );

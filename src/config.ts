@@ -42,6 +42,14 @@ const config = {
     zhAnalysis: { defaultPrice: 5, discountFactor: 0.1, maxRecharge: 9999 },
     enAnalysis: { defaultPrice: 5, discountFactor: 0.2, maxRecharge: 9999 },
   },
+  rechargeUnit: 10,
+  minRechargeAmount: 20,
+  pointDeductions: {
+    zhSummary: 2,
+    enSummary: 3,
+    zhAnalysis: 5,
+    enAnalysis: 6,
+  },
 };
 
 export default config;

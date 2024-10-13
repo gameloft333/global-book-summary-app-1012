@@ -1,36 +1,31 @@
-import Loki from 'lokijs';
 import { DailyUsage } from '../types';
 
 interface Player {
   userId: string;
   dailyUsage: DailyUsage;
-  rechargeHistory: Array<{
-    type: keyof DailyUsage;
-    amount: number;
-    date: Date;
-  }>;
 }
 
 class DatabaseService {
-  private db: Loki;
-  private players: Collection<Player>;
+  private players: Map<string, Player> = new Map();
 
   constructor() {
-    this.db = new Loki('player_database', {
-      adapter: new Loki.LokiMemoryAdapter()
-    });
-    this.databaseInitialize();
+    this.loadFromStorage();
   }
 
-  private databaseInitialize() {
-    this.players = this.db.getCollection('players');
-    if (this.players === null) {
-      this.players = this.db.addCollection('players');
+  private loadFromStorage() {
+    const storedData = localStorage.getItem('players');
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      this.players = new Map(parsedData);
     }
   }
 
-  async getPlayerById(userId: string): Promise<Player | null> {
-    return this.players.findOne({ userId });
+  private saveToStorage() {
+    localStorage.setItem('players', JSON.stringify(Array.from(this.players.entries())));
+  }
+
+  async getPlayerById(userId: string): Promise<Player | undefined> {
+    return this.players.get(userId);
   }
 
   async createPlayer(userId: string): Promise<Player> {
@@ -40,36 +35,30 @@ class DatabaseService {
         zhSummary: 0,
         enSummary: 0,
         zhAnalysis: 0,
-        enAnalysis: 0,
-      },
-      rechargeHistory: [],
+        enAnalysis: 0
+      }
     };
-    return this.players.insert(newPlayer);
+    this.players.set(userId, newPlayer);
+    this.saveToStorage();
+    return newPlayer;
   }
 
-  async updatePlayerUsage(userId: string, usageType: keyof DailyUsage, amount: number): Promise<Player> {
-    const player = this.players.findOne({ userId });
-    if (!player) throw new Error('Player not found');
-
-    player.dailyUsage[usageType] += amount;
-    return this.players.update(player);
+  async updatePlayerUsage(userId: string, type: keyof DailyUsage, change: number): Promise<void> {
+    const player = this.players.get(userId);
+    if (player) {
+      player.dailyUsage[type] += change;
+      this.players.set(userId, player);
+      this.saveToStorage();
+    }
   }
 
-  async addRechargeRecord(userId: string, type: keyof DailyUsage, amount: number): Promise<Player> {
-    const player = this.players.findOne({ userId });
-    if (!player) throw new Error('Player not found');
-
-    player.rechargeHistory.push({ type, amount, date: new Date() });
-    player.dailyUsage[type] += amount;
-    return this.players.update(player);
-  }
-
-  async getAllPlayers(): Promise<Player[]> {
-    return this.players.find();
-  }
-
-  saveDatabase() {
-    this.db.saveDatabase();
+  async addRechargeRecord(userId: string, type: keyof DailyUsage, amount: number): Promise<void> {
+    const player = this.players.get(userId);
+    if (player) {
+      player.dailyUsage[type] += amount;
+      this.players.set(userId, player);
+      this.saveToStorage();
+    }
   }
 }
 

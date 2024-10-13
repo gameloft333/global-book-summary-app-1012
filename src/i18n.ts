@@ -44,7 +44,9 @@ const resources = {
       remainingUsage: "Remaining Usage",
       totalPrice: "Total Price",
       recharge: "Recharge",
-      rechargeSuccess: "{{type}} recharged successfully, increased {{amount}} times usage"
+      rechargeSuccess: "{{type}} recharged successfully, increased {{amount}} times usage",
+      helpTitle: "Usage Guide",
+      pointDeduction: "Point Deduction: {{points}}"
     }
   },
   zh: {
@@ -61,8 +63,8 @@ const resources = {
       analysisChinese: "拆书（中文）",
       analysisEnglish: "拆书（英文）",
       unknownError: "发生未知错误",
-      paymentRequired: "次数不足",
-      dailyLimitReached: "您的次数已经用完，如您想继续使用，请先充值能量哦~",
+      paymentRequired: "点数不足",
+      dailyLimitReached: "您的点数已经用完，如您想继续使用，请先充值能量哦~",
       close: "关闭",
       toggleAdminPanel: "管理面板",
       enterAdminKey: "请输入管理员密钥",
@@ -81,15 +83,17 @@ const resources = {
       enSummary: "英文摘要",
       zhAnalysis: "中文分析",
       enAnalysis: "英文分析",
-      maxRetriesReached: "达到最大重试次数",
+      maxRetriesReached: "达到最大重试点数",
       updateUsage: "更新{{type}}使用量",
       rechargeTitle: "充值",
       defaultPrice: "默认价格",
       discountPrice: "优惠价格",
-      remainingUsage: "剩余次数",
+      remainingUsage: "剩余点数",
       totalPrice: "总价",
       recharge: "充值",
-      rechargeSuccess: "{{type}}充值成功，增加{{amount}}次使用次数"
+      rechargeSuccess: "{{type}}充值成功，增加{{amount}}次使用点数",
+      helpTitle: "点数扣除说明",
+      pointDeduction: "每次扣除点数: {{points}}"
     }
   }
 };

@@ -13,8 +13,8 @@ export async function getUserData(userId: string): Promise<{ id: string; remaini
   };
 }
 
-export async function updateUserUsage(userId: string, type: keyof DailyUsage): Promise<void> {
-  await databaseService.updatePlayerUsage(userId, type, -1);
+export async function updateUserUsage(userId: string, type: keyof DailyUsage, pointsToDeduct: number): Promise<void> {
+  await databaseService.updatePlayerUsage(userId, type, -pointsToDeduct);
 }
 
 export async function setUserUsage(userId: string, type: keyof DailyUsage, value: number): Promise<void> {
