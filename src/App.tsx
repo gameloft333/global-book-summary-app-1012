@@ -163,13 +163,9 @@ const App: React.FC = () => {
 
   const handleAdminPanelToggle = () => {
     const adminKey = prompt(t('enterAdminKey'));
-    console.log('输入的管理员密钥:', adminKey);
-    if (adminKey === config.adminKey) {
-      console.log('密钥验证成功，切换管理面板状态');
+    if (adminKey === import.meta.env.VITE_ADMIN_KEY) {
       setShowAdminPanel(!showAdminPanel);
-      console.log('管理面板状态:', !showAdminPanel);
     } else {
-      console.log('密钥验证失败');
       alert(t('invalidAdminKey'));
     }
   };

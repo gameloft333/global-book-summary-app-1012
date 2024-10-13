@@ -16,12 +16,12 @@ const config = {
   },
   version: '0.7.10',
   dailyLimits: {
-    zhSummary: 5,
-    enSummary: 3,
-    zhAnalysis: 4,
-    enAnalysis: 2,
+    zhSummary: 6,
+    enSummary: 6,
+    zhAnalysis: 6,
+    enAnalysis: 6
   },
-  adminKey: '1', // This should be a secure key in a real application
+  adminKey: 'iDSV1NrPbUXoULPxXhmO', // This should be a secure key in a real application
   paymentMethods: {
     paypal: {
       type: PaymentMethod.PayPal,
@@ -42,12 +42,12 @@ const config = {
     zhAnalysis: { defaultPrice: 5, discountFactor: 0.1, maxRecharge: 9999 },
     enAnalysis: { defaultPrice: 5, discountFactor: 0.2, maxRecharge: 9999 },
   },
-  rechargeUnit: 10,
-  minRechargeAmount: 20,
+  rechargeUnit: 20,
+  minRechargeAmount: 40,
   pointDeductions: {
     zhSummary: 2,
     enSummary: 3,
-    zhAnalysis: 5,
+    zhAnalysis: 3,
     enAnalysis: 6,
   },
 };

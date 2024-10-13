@@ -43,7 +43,7 @@ const resources = {
       discountPrice: "Discount Price",
       remainingUsage: "Remaining Usage",
       totalPrice: "Total Price",
-      recharge: "Recharge",
+      recharge: "Recharge Points",
       rechargeSuccess: "{{type}} recharged successfully, increased {{amount}} times usage",
       helpTitle: "Usage Guide",
       pointDeduction: "Point Deduction: {{points}}"
@@ -90,7 +90,7 @@ const resources = {
       discountPrice: "优惠价格",
       remainingUsage: "剩余点数",
       totalPrice: "总价",
-      recharge: "充值",
+      recharge: "充值点数",
       rechargeSuccess: "{{type}}充值成功，增加{{amount}}次使用点数",
       helpTitle: "点数扣除说明",
       pointDeduction: "每次扣除点数: {{points}}"
