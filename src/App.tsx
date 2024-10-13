@@ -4,12 +4,13 @@ import { generateBookSummary } from './services/geminiService';
 import { generateBookAnalysis } from './services/kimiService';
 import QRCode from 'qrcode.react';
 import config from './config';
-import { Book, AlertCircle, Settings } from 'lucide-react';
+import { Book, AlertCircle, Settings, CreditCard } from 'lucide-react';
 import { generateUserId } from './services/userIdService';
 import { DailyUsage, PaymentMethod } from './types';
 import PaymentModal from './components/PaymentModal';
 import AdminPanel from './components/AdminPanel';
 import { getUserData, updateUserUsage } from './services/userService';
+import RechargeModal from './components/RechargeModal';
 
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -36,6 +37,7 @@ const App: React.FC = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [showRechargeModal, setShowRechargeModal] = useState(false);
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('userId');
@@ -167,6 +169,14 @@ const App: React.FC = () => {
     setDailyUsage(updatedUsage);
   };
 
+  const handleRecharge = (type: keyof DailyUsage, amount: number) => {
+    const updatedUsage = { ...dailyUsage, [type]: dailyUsage[type] + amount };
+    setDailyUsage(updatedUsage);
+    localStorage.setItem('dailyUsage', JSON.stringify(updatedUsage));
+    setShowRechargeModal(false);
+    alert(t('rechargeSuccess', { type: t(type), amount }));
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white rounded-lg shadow-lg p-6 w-[600px] border-t-4" style={{ borderColor: themeColor }}>
@@ -272,6 +282,12 @@ const App: React.FC = () => {
           >
             <Settings className="w-5 h-5" />
           </button>
+          <button
+            onClick={() => setShowRechargeModal(true)}
+            className="text-gray-500 hover:text-gray-700 transition duration-300 ml-2"
+          >
+            <CreditCard className="w-5 h-5" />
+          </button>
           <div 
             className="text-gray-500"
             style={{
@@ -297,6 +313,12 @@ const App: React.FC = () => {
           onUsageUpdate={handleUsageUpdate}
         />
       )}
+      <RechargeModal
+        isOpen={showRechargeModal}
+        onClose={() => setShowRechargeModal(false)}
+        dailyUsage={dailyUsage}
+        onRecharge={handleRecharge}
+      />
     </div>
   );
 };

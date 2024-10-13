@@ -36,6 +36,12 @@ const config = {
       qrCode: 'https://example.com/alipay-qr-code.png',
     },
   },
+  rechargeOptions: {
+    zhSummary: { defaultPrice: 10, discountFactor: 0.8 },
+    enSummary: { defaultPrice: 15, discountFactor: 0.8 },
+    zhAnalysis: { defaultPrice: 20, discountFactor: 0.8 },
+    enAnalysis: { defaultPrice: 25, discountFactor: 0.8 },
+  },
 };
 
 export default config;

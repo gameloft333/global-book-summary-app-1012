@@ -37,7 +37,14 @@ const resources = {
       zhAnalysis: "English Analysis",
       enAnalysis: "English Analysis",
       maxRetriesReached: "Max retries reached",
-      updateUsage: "Update {{type}} usage"
+      updateUsage: "Update {{type}} usage",
+      rechargeTitle: "Recharge",
+      defaultPrice: "Default Price",
+      discountPrice: "Discount Price",
+      remainingUsage: "Remaining Usage",
+      totalPrice: "Total Price",
+      recharge: "Recharge",
+      rechargeSuccess: "{{type}} recharged successfully, increased {{amount}} times usage"
     }
   },
   zh: {
@@ -75,7 +82,14 @@ const resources = {
       zhAnalysis: "中文分析",
       enAnalysis: "英文分析",
       maxRetriesReached: "达到最大重试次数",
-      updateUsage: "更新{{type}}使用量"
+      updateUsage: "更新{{type}}使用量",
+      rechargeTitle: "充值",
+      defaultPrice: "默认价格",
+      discountPrice: "优惠价格",
+      remainingUsage: "剩余次数",
+      totalPrice: "总价",
+      recharge: "充值",
+      rechargeSuccess: "{{type}}充值成功，增加{{amount}}次使用次数"
     }
   }
 };
