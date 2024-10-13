@@ -37,10 +37,10 @@ const config = {
     },
   },
   rechargeOptions: {
-    zhSummary: { defaultPrice: 10, discountFactor: 0.8 },
-    enSummary: { defaultPrice: 15, discountFactor: 0.8 },
-    zhAnalysis: { defaultPrice: 20, discountFactor: 0.8 },
-    enAnalysis: { defaultPrice: 25, discountFactor: 0.8 },
+    zhSummary: { defaultPrice: 5, discountFactor: 0.05, maxRecharge: 9999 },
+    enSummary: { defaultPrice: 5, discountFactor: 0.07, maxRecharge: 9999 },
+    zhAnalysis: { defaultPrice: 5, discountFactor: 0.1, maxRecharge: 9999 },
+    enAnalysis: { defaultPrice: 5, discountFactor: 0.2, maxRecharge: 9999 },
   },
 };
 
