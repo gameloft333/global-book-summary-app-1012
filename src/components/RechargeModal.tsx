@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X } from 'lucide-react';
+import { X, Plus, Minus } from 'lucide-react';
 import config from '../config';
 import { DailyUsage } from '../types';
 
@@ -22,8 +22,11 @@ const RechargeModal: React.FC<RechargeModalProps> = ({ isOpen, onClose, dailyUsa
 
   if (!isOpen) return null;
 
-  const handleAmountChange = (type: keyof DailyUsage, amount: number) => {
-    setRechargeAmounts(prev => ({ ...prev, [type]: amount }));
+  const handleAmountChange = (type: keyof DailyUsage, change: number) => {
+    setRechargeAmounts(prev => ({
+      ...prev,
+      [type]: Math.max(1, prev[type] + change)
+    }));
   };
 
   const calculatePrice = (type: keyof DailyUsage) => {
@@ -32,36 +35,48 @@ const RechargeModal: React.FC<RechargeModalProps> = ({ isOpen, onClose, dailyUsa
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
-        <button onClick={onClose} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
-          <X className="w-5 h-5" />
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl relative w-full max-w-4xl overflow-auto">
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+          <X className="w-6 h-6" />
         </button>
-        <h2 className="text-2xl font-bold mb-4">{t('rechargeTitle')}</h2>
-        {Object.entries(config.rechargeOptions).map(([type, option]) => (
-          <div key={type} className="mb-4 p-4 border rounded">
-            <h3 className="font-semibold mb-2">{t(type)}</h3>
-            <p>{t('defaultPrice')}: ¥{option.defaultPrice}</p>
-            <p>{t('discountPrice')}: ¥{(option.defaultPrice * option.discountFactor).toFixed(2)}</p>
-            <p>{t('remainingUsage')}: {dailyUsage[type as keyof DailyUsage]}</p>
-            <div className="flex items-center mt-2">
-              <input
-                type="number"
-                min="1"
-                value={rechargeAmounts[type as keyof DailyUsage]}
-                onChange={(e) => handleAmountChange(type as keyof DailyUsage, parseInt(e.target.value) || 1)}
-                className="w-20 p-2 border rounded mr-2"
-              />
-              <p className="flex-grow">{t('totalPrice')}: ¥{calculatePrice(type as keyof DailyUsage).toFixed(2)}</p>
-              <button
-                onClick={() => onRecharge(type as keyof DailyUsage, rechargeAmounts[type as keyof DailyUsage])}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                {t('recharge')}
-              </button>
+        <h2 className="text-3xl font-bold p-6 text-gray-800 border-b">{t('rechargeTitle')}</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+          {Object.entries(config.rechargeOptions).map(([type, option]) => (
+            <div key={type} className="bg-gray-50 rounded-xl p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-700">{t(type)}</h3>
+                <span className="text-sm text-gray-500">{t('remainingUsage')}: {dailyUsage[type as keyof DailyUsage]}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <button
+                    onClick={() => handleAmountChange(type as keyof DailyUsage, -1)}
+                    className="bg-gray-200 text-gray-600 p-2 rounded-full hover:bg-gray-300 transition-colors"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="mx-4 text-xl font-semibold">{rechargeAmounts[type as keyof DailyUsage]}</span>
+                  <button
+                    onClick={() => handleAmountChange(type as keyof DailyUsage, 1)}
+                    className="bg-gray-200 text-gray-600 p-2 rounded-full hover:bg-gray-300 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-bold text-gray-800">¥{calculatePrice(type as keyof DailyUsage).toFixed(2)}</p>
+                  <button
+                    onClick={() => onRecharge(type as keyof DailyUsage, rechargeAmounts[type as keyof DailyUsage])}
+                    className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                  >
+                    {t('recharge')}
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

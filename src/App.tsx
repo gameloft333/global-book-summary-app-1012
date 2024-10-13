@@ -78,7 +78,7 @@ const App: React.FC = () => {
     }
     const usageType = lang === 'zh' ? 'zhSummary' : 'enSummary';
     if (dailyUsage[usageType] <= 0) {
-      setShowPaymentModal(true);
+      setShowRechargeModal(true);
       return;
     }
     setIsGeneratingZhSummary(lang === 'zh');
@@ -114,7 +114,7 @@ const App: React.FC = () => {
     }
     const usageType = lang === 'zh' ? 'zhAnalysis' : 'enAnalysis';
     if (dailyUsage[usageType] <= 0) {
-      setShowPaymentModal(true);
+      setShowRechargeModal(true);
       return;
     }
     setIsGeneratingZhAnalysis(lang === 'zh');
