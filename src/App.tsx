@@ -9,7 +9,7 @@ import { generateUserId } from './services/userIdService';
 import { DailyUsage, PaymentMethod } from './types';
 import PaymentModal from './components/PaymentModal';
 import AdminPanel from './components/AdminPanel';
-import { getUserData, updateUserUsage } from './services/userService';
+import { getUserData, updateUserUsage, rechargeUserUsage } from './services/userService';
 import RechargeModal from './components/RechargeModal';
 
 const App: React.FC = () => {
@@ -38,19 +38,34 @@ const App: React.FC = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [showRechargeModal, setShowRechargeModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [notification, setNotification] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem('userId');
-    if (storedUserId) {
-      setUserId(storedUserId);
-      const userData = getUserData(storedUserId);
-      setDailyUsage(userData.remainingUsage);
-    } else {
-      const newUserId = generateUserId(); // 假设你有这个函数
-      setUserId(newUserId);
-      localStorage.setItem('userId', newUserId);
-      setDailyUsage({ ...config.dailyLimits });
-    }
+    const initializeUser = async () => {
+      try {
+        setIsLoading(true);
+        const storedUserId = localStorage.getItem('userId');
+        if (storedUserId) {
+          setUserId(storedUserId);
+          const userData = await getUserData(storedUserId);
+          setDailyUsage(userData.remainingUsage);
+        } else {
+          const newUserId = generateUserId();
+          setUserId(newUserId);
+          localStorage.setItem('userId', newUserId);
+          const userData = await getUserData(newUserId);
+          setDailyUsage(userData.remainingUsage);
+        }
+      } catch (error) {
+        console.error('Error initializing user:', error);
+        setError('Failed to initialize user data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeUser();
   }, []);
 
   useEffect(() => {
@@ -72,35 +87,29 @@ const App: React.FC = () => {
   };
 
   const handleGenerateSummary = async (lang: 'zh' | 'en') => {
-    if (!bookName) {
-      setError(t('pleaseEnterBookName'));
-      return;
-    }
     const usageType = lang === 'zh' ? 'zhSummary' : 'enSummary';
     if (dailyUsage[usageType] <= 0) {
       setShowRechargeModal(true);
       return;
     }
+    if (!bookName.trim()) {
+      setNotification(t('pleaseEnterBookName'));
+      return;
+    }
+    setNotification(null);
     setIsGeneratingZhSummary(lang === 'zh');
     setIsGeneratingEnSummary(lang === 'en');
     setLanguage(lang);
-    setError(null);
-    setSummary('');
     try {
       const result = await generateBookSummary(bookName, lang);
       setSummary(result);
       setQrValue(result);
       const updatedUsage = { ...dailyUsage, [usageType]: Math.max(0, dailyUsage[usageType] - 1) };
       setDailyUsage(updatedUsage);
-      localStorage.setItem('dailyUsage', JSON.stringify(updatedUsage));
-      updateUserUsage(userId, usageType);
+      await updateUserUsage(userId, usageType);
     } catch (error) {
       console.error('Error generating summary:', error);
-      if (error instanceof Error) {
-        setError(t('failedToGenerateSummary') + ': ' + error.message);
-      } else {
-        setError(t('failedToGenerateSummary') + ': ' + t('unknownError'));
-      }
+      setError(t('failedToGenerateSummary') + ': ' + (error instanceof Error ? error.message : t('unknownError')));
     } finally {
       setIsGeneratingZhSummary(false);
       setIsGeneratingEnSummary(false);
@@ -108,35 +117,29 @@ const App: React.FC = () => {
   };
 
   const handleGenerateAnalysis = async (lang: 'zh' | 'en') => {
-    if (!bookName) {
-      setError(t('pleaseEnterBookName'));
-      return;
-    }
     const usageType = lang === 'zh' ? 'zhAnalysis' : 'enAnalysis';
     if (dailyUsage[usageType] <= 0) {
       setShowRechargeModal(true);
       return;
     }
+    if (!bookName.trim()) {
+      setNotification(t('pleaseEnterBookName'));
+      return;
+    }
+    setNotification(null);
     setIsGeneratingZhAnalysis(lang === 'zh');
     setIsGeneratingEnAnalysis(lang === 'en');
     setLanguage(lang);
-    setError(null);
-    setSummary('');
     try {
       const result = await generateBookAnalysis(bookName, lang);
       setSummary(result);
       setQrValue(result);
       const updatedUsage = { ...dailyUsage, [usageType]: Math.max(0, dailyUsage[usageType] - 1) };
       setDailyUsage(updatedUsage);
-      localStorage.setItem('dailyUsage', JSON.stringify(updatedUsage));
-      updateUserUsage(userId, usageType);
+      await updateUserUsage(userId, usageType);
     } catch (error) {
       console.error('Error generating analysis:', error);
-      if (error instanceof Error) {
-        setError(t('failedToGenerateAnalysis') + ': ' + error.message);
-      } else {
-        setError(t('failedToGenerateAnalysis') + ': ' + t('unknownError'));
-      }
+      setError(t('failedToGenerateAnalysis') + ': ' + (error instanceof Error ? error.message : t('unknownError')));
     } finally {
       setIsGeneratingZhAnalysis(false);
       setIsGeneratingEnAnalysis(false);
@@ -169,13 +172,21 @@ const App: React.FC = () => {
     setDailyUsage(updatedUsage);
   };
 
-  const handleRecharge = (type: keyof DailyUsage, amount: number) => {
-    const updatedUsage = { ...dailyUsage, [type]: dailyUsage[type] + amount };
-    setDailyUsage(updatedUsage);
-    localStorage.setItem('dailyUsage', JSON.stringify(updatedUsage));
+  const handleRecharge = async (type: keyof DailyUsage, amount: number) => {
+    await rechargeUserUsage(userId, type, amount);
+    const updatedUserData = await getUserData(userId);
+    setDailyUsage(updatedUserData.remainingUsage);
     setShowRechargeModal(false);
     alert(t('rechargeSuccess', { type: t(type), amount }));
   };
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">加载中...</div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -249,10 +260,9 @@ const App: React.FC = () => {
             </span>
           </button>
         </div>
-        {error && (
-          <div className="mt-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded flex items-center">
-            <AlertCircle className="w-5 h-5 mr-2" />
-            {error}
+        {notification && (
+          <div className="mb-4 p-2 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+            {notification}
           </div>
         )}
         {summary && (

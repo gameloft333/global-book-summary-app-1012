@@ -1,41 +1,30 @@
 import { DailyUsage } from '../types';
 import config from '../config';
+import databaseService from './databaseService';
 
-interface UserData {
-  id: string;
-  remainingUsage: DailyUsage;
-}
-
-export function getUserData(userId: string): UserData {
-  const storedData = localStorage.getItem(`user_${userId}`);
-  if (storedData) {
-    const parsedData = JSON.parse(storedData);
-    return {
-      id: userId,
-      remainingUsage: {
-        zhSummary: parsedData.remainingUsage.zhSummary ?? config.dailyLimits.zhSummary,
-        enSummary: parsedData.remainingUsage.enSummary ?? config.dailyLimits.enSummary,
-        zhAnalysis: parsedData.remainingUsage.zhAnalysis ?? config.dailyLimits.zhAnalysis,
-        enAnalysis: parsedData.remainingUsage.enAnalysis ?? config.dailyLimits.enAnalysis
-      }
-    };
+export async function getUserData(userId: string): Promise<{ id: string; remainingUsage: DailyUsage }> {
+  let player = await databaseService.getPlayerById(userId);
+  if (!player) {
+    player = await databaseService.createPlayer(userId);
   }
   return {
-    id: userId,
-    remainingUsage: { ...config.dailyLimits }
+    id: player.userId,
+    remainingUsage: player.dailyUsage
   };
 }
 
-export function updateUserUsage(userId: string, type: 'zhSummary' | 'enSummary' | 'zhAnalysis' | 'enAnalysis'): void {
-  const userData = getUserData(userId);
-  if (userData.remainingUsage[type] > 0) {
-    userData.remainingUsage[type]--;
-    localStorage.setItem(`user_${userId}`, JSON.stringify(userData));
-  }
+export async function updateUserUsage(userId: string, type: keyof DailyUsage): Promise<void> {
+  await databaseService.updatePlayerUsage(userId, type, -1);
 }
 
-export function setUserUsage(userId: string, type: 'zhSummary' | 'enSummary' | 'zhAnalysis' | 'enAnalysis', value: number): void {
-  const userData = getUserData(userId);
-  userData.remainingUsage[type] = value;
-  localStorage.setItem(`user_${userId}`, JSON.stringify(userData));
+export async function setUserUsage(userId: string, type: keyof DailyUsage, value: number): Promise<void> {
+  const player = await databaseService.getPlayerById(userId);
+  if (!player) throw new Error('Player not found');
+  const currentUsage = player.dailyUsage[type];
+  const difference = value - currentUsage;
+  await databaseService.updatePlayerUsage(userId, type, difference);
+}
+
+export async function rechargeUserUsage(userId: string, type: keyof DailyUsage, amount: number): Promise<void> {
+  await databaseService.addRechargeRecord(userId, type, amount);
 }

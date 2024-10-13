@@ -12,30 +12,27 @@ interface AdminPanelProps {
 const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onUsageUpdate }) => {
   const { t } = useTranslation();
   const [userId, setUserId] = useState('');
-  const [zhSummaryUsage, setZhSummaryUsage] = useState(0);
-  const [enSummaryUsage, setEnSummaryUsage] = useState(0);
-  const [zhAnalysisUsage, setZhAnalysisUsage] = useState(0);
-  const [enAnalysisUsage, setEnAnalysisUsage] = useState(0);
+  const [usages, setUsages] = useState<DailyUsage>({
+    zhSummary: 0,
+    enSummary: 0,
+    zhAnalysis: 0,
+    enAnalysis: 0
+  });
 
-  const handleFetchUser = () => {
-    const userData = getUserData(userId);
-    setZhSummaryUsage(userData.remainingUsage.zhSummary);
-    setEnSummaryUsage(userData.remainingUsage.enSummary);
-    setZhAnalysisUsage(userData.remainingUsage.zhAnalysis);
-    setEnAnalysisUsage(userData.remainingUsage.enAnalysis);
+  const handleFetchUser = async () => {
+    const userData = await getUserData(userId);
+    setUsages(userData.remainingUsage);
   };
 
-  const handleUpdateUsage = (type: 'zhSummary' | 'enSummary' | 'zhAnalysis' | 'enAnalysis') => {
-    const usage = {
-      zhSummary: zhSummaryUsage,
-      enSummary: enSummaryUsage,
-      zhAnalysis: zhAnalysisUsage,
-      enAnalysis: enAnalysisUsage
-    }[type];
-    setUserUsage(userId, type, usage);
-    const updatedUsage = getUserData(userId).remainingUsage;
+  const handleUpdateUsage = async (type: keyof DailyUsage) => {
+    await setUserUsage(userId, type, usages[type]);
+    const updatedUsage = (await getUserData(userId)).remainingUsage;
     onUsageUpdate(updatedUsage);
     alert(t('usageUpdated', { language: t(type) }));
+  };
+
+  const handleUsageChange = (type: keyof DailyUsage, value: number) => {
+    setUsages(prev => ({ ...prev, [type]: value }));
   };
 
   console.log('AdminPanel 组件被渲染');
@@ -59,21 +56,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onUsageUpdate }) => {
             {t('fetchUserData')}
           </button>
         </div>
-        {['zhSummary', 'enSummary', 'zhAnalysis', 'enAnalysis'].map((type) => (
+        {(Object.keys(usages) as Array<keyof DailyUsage>).map((type) => (
           <div key={type} className="mb-4">
             <label className="block mb-2">{t(type)}:</label>
             <input
               type="number"
-              value={eval(`${type}Usage`)}
-              onChange={(e) => {
-                const setValue = {
-                  zhSummary: setZhSummaryUsage,
-                  enSummary: setEnSummaryUsage,
-                  zhAnalysis: setZhAnalysisUsage,
-                  enAnalysis: setEnAnalysisUsage
-                }[type];
-                setValue(parseInt(e.target.value));
-              }}
+              value={usages[type]}
+              onChange={(e) => handleUsageChange(type, parseInt(e.target.value))}
               className="w-full p-2 border rounded"
             />
             <button onClick={() => handleUpdateUsage(type)} className="mt-2 bg-green-500 text-white p-2 rounded w-full">
