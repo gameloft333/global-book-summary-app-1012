@@ -9,7 +9,16 @@ interface UserData {
 export function getUserData(userId: string): UserData {
   const storedData = localStorage.getItem(`user_${userId}`);
   if (storedData) {
-    return JSON.parse(storedData);
+    const parsedData = JSON.parse(storedData);
+    return {
+      id: userId,
+      remainingUsage: {
+        zhSummary: parsedData.remainingUsage.zhSummary ?? config.dailyLimits.zhSummary,
+        enSummary: parsedData.remainingUsage.enSummary ?? config.dailyLimits.enSummary,
+        zhAnalysis: parsedData.remainingUsage.zhAnalysis ?? config.dailyLimits.zhAnalysis,
+        enAnalysis: parsedData.remainingUsage.enAnalysis ?? config.dailyLimits.enAnalysis
+      }
+    };
   }
   return {
     id: userId,

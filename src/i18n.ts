@@ -36,7 +36,8 @@ const resources = {
       enSummary: "English Summary",
       zhAnalysis: "English Analysis",
       enAnalysis: "English Analysis",
-      maxRetriesReached: "Max retries reached"
+      maxRetriesReached: "Max retries reached",
+      updateUsage: "Update {{type}} usage"
     }
   },
   zh: {
@@ -73,7 +74,8 @@ const resources = {
       enSummary: "英文摘要",
       zhAnalysis: "中文分析",
       enAnalysis: "英文分析",
-      maxRetriesReached: "达到最大重试次数"
+      maxRetriesReached: "达到最大重试次数",
+      updateUsage: "更新{{type}}使用量"
     }
   }
 };

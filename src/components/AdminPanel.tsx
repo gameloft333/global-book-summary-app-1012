@@ -42,7 +42,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onUsageUpdate }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg relative">
+      <div className="bg-white p-6 rounded-lg shadow-lg relative max-w-md w-full">
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
           <X className="w-5 h-5" />
         </button>
@@ -55,34 +55,32 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onUsageUpdate }) => {
             placeholder={t('enterUserId')}
             className="w-full p-2 border rounded"
           />
-          <button onClick={handleFetchUser} className="mt-2 bg-blue-500 text-white p-2 rounded">
+          <button onClick={handleFetchUser} className="mt-2 bg-blue-500 text-white p-2 rounded w-full">
             {t('fetchUserData')}
           </button>
         </div>
-        <div className="mb-4">
-          <label className="block mb-2">{t('chineseUsage')}:</label>
-          <input
-            type="number"
-            value={zhUsage}
-            onChange={(e) => setZhUsage(parseInt(e.target.value))}
-            className="w-full p-2 border rounded"
-          />
-          <button onClick={() => handleUpdateUsage('zh')} className="mt-2 bg-green-500 text-white p-2 rounded">
-            {t('updateChineseUsage')}
-          </button>
-        </div>
-        <div className="mb-4">
-          <label className="block mb-2">{t('englishUsage')}:</label>
-          <input
-            type="number"
-            value={enUsage}
-            onChange={(e) => setEnUsage(parseInt(e.target.value))}
-            className="w-full p-2 border rounded"
-          />
-          <button onClick={() => handleUpdateUsage('en')} className="mt-2 bg-green-500 text-white p-2 rounded">
-            {t('updateEnglishUsage')}
-          </button>
-        </div>
+        {['zhSummary', 'enSummary', 'zhAnalysis', 'enAnalysis'].map((type) => (
+          <div key={type} className="mb-4">
+            <label className="block mb-2">{t(type)}:</label>
+            <input
+              type="number"
+              value={eval(`${type}Usage`)}
+              onChange={(e) => {
+                const setValue = {
+                  zhSummary: setZhSummaryUsage,
+                  enSummary: setEnSummaryUsage,
+                  zhAnalysis: setZhAnalysisUsage,
+                  enAnalysis: setEnAnalysisUsage
+                }[type];
+                setValue(parseInt(e.target.value));
+              }}
+              className="w-full p-2 border rounded"
+            />
+            <button onClick={() => handleUpdateUsage(type)} className="mt-2 bg-green-500 text-white p-2 rounded w-full">
+              {t('updateUsage', { type: t(type) })}
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );

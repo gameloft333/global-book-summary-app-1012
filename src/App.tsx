@@ -22,31 +22,47 @@ const App: React.FC = () => {
   const [qrValue, setQrValue] = useState('');
   const [language, setLanguage] = useState<'zh' | 'en'>('zh');
   const [themeColor, setThemeColor] = useState('');
-  const [userId, setUserId] = useState('');
+  const [userId, setUserId] = useState(() => {
+    return localStorage.getItem('userId') || generateUserId();
+  });
   const [error, setError] = useState<string | null>(null);
-  const [dailyUsage, setDailyUsage] = useState<DailyUsage>({ zhSummary: 0, enSummary: 0, zhAnalysis: 0, enAnalysis: 0 });
+  const [dailyUsage, setDailyUsage] = useState<DailyUsage>(() => {
+    const storedUsage = localStorage.getItem('dailyUsage');
+    if (storedUsage) {
+      return JSON.parse(storedUsage);
+    }
+    return { ...config.dailyLimits };
+  });
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   useEffect(() => {
-    setThemeColor(getRandomColor());
     const storedUserId = localStorage.getItem('userId');
     if (storedUserId) {
       setUserId(storedUserId);
+      const userData = getUserData(storedUserId);
+      setDailyUsage(userData.remainingUsage);
     } else {
-      const newUserId = generateUserId();
+      const newUserId = generateUserId(); // 假设你有这个函数
       setUserId(newUserId);
       localStorage.setItem('userId', newUserId);
+      setDailyUsage({ ...config.dailyLimits });
     }
   }, []);
 
   useEffect(() => {
+    setThemeColor(getRandomColor());
     if (userId) {
+      localStorage.setItem('userId', userId);
       const userData = getUserData(userId);
       setDailyUsage(userData.remainingUsage);
     }
   }, [userId]);
+
+  useEffect(() => {
+    localStorage.setItem('dailyUsage', JSON.stringify(dailyUsage));
+  }, [dailyUsage]);
 
   const getRandomColor = () => {
     const hue = Math.floor(Math.random() * 360);
@@ -72,11 +88,10 @@ const App: React.FC = () => {
       const result = await generateBookSummary(bookName, lang);
       setSummary(result);
       setQrValue(result);
+      const updatedUsage = { ...dailyUsage, [usageType]: Math.max(0, dailyUsage[usageType] - 1) };
+      setDailyUsage(updatedUsage);
+      localStorage.setItem('dailyUsage', JSON.stringify(updatedUsage));
       updateUserUsage(userId, usageType);
-      setDailyUsage(prevUsage => ({
-        ...prevUsage,
-        [usageType]: prevUsage[usageType] - 1
-      }));
     } catch (error) {
       console.error('Error generating summary:', error);
       if (error instanceof Error) {
@@ -109,11 +124,10 @@ const App: React.FC = () => {
       const result = await generateBookAnalysis(bookName, lang);
       setSummary(result);
       setQrValue(result);
+      const updatedUsage = { ...dailyUsage, [usageType]: Math.max(0, dailyUsage[usageType] - 1) };
+      setDailyUsage(updatedUsage);
+      localStorage.setItem('dailyUsage', JSON.stringify(updatedUsage));
       updateUserUsage(userId, usageType);
-      setDailyUsage(prevUsage => ({
-        ...prevUsage,
-        [usageType]: prevUsage[usageType] - 1
-      }));
     } catch (error) {
       console.error('Error generating analysis:', error);
       if (error instanceof Error) {
@@ -133,7 +147,7 @@ const App: React.FC = () => {
   };
 
   const getRemainingUsage = (type: 'zhSummary' | 'enSummary' | 'zhAnalysis' | 'enAnalysis') => {
-    return Math.max(0, dailyUsage[type]);
+    return Math.max(0, dailyUsage[type] || 0);
   };
 
   const handleAdminPanelToggle = () => {
