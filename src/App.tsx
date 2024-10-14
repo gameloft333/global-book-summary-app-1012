@@ -9,7 +9,7 @@ import { generateUserId } from './services/userIdService';
 import { DailyUsage, PaymentMethod } from './types';
 import PaymentModal from './components/PaymentModal';
 import AdminPanel from './components/AdminPanel';
-import { getUserData, updateUserUsage, rechargeUserUsage } from './services/userService';
+import { getUserData, updateUserUsage, rechargeUserUsage, claimDailyUsage, resetClaimStatus } from './services/userService';
 import RechargeModal from './components/RechargeModal';
 import HelpModal from './components/HelpModal';
 
@@ -188,6 +188,35 @@ const App: React.FC = () => {
     }
   };
 
+  const handleClaim = async () => {
+    if (!userId) return;
+    try {
+      await claimDailyUsage(userId);
+      const updatedUserData = await getUserData(userId);
+      setDailyUsage(updatedUserData.remainingUsage);
+      // const claimedTypes = Object.keys(config.dailyClaimAmount).map(type => t(type)).join(', ');
+      // setNotification(t('claimSuccess', { type: claimedTypes }));
+      setNotification(t('claimSuccessAll'));
+    } catch (error) {
+      if (error instanceof Error) {
+        setNotification(error.message);
+      } else {
+        setNotification(t('unknownError'));
+      }
+    }
+  };
+
+  const handleResetClaim = async () => {
+    if (!userId) return;
+    try {
+      await resetClaimStatus(userId);
+      setNotification(t('claimStatusReset'));
+    } catch (error) {
+      console.error('Error resetting claim status:', error);
+      setNotification(t('errorResettingClaimStatus'));
+    }
+  };
+
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">加载中...</div>;
   }
@@ -204,13 +233,32 @@ const App: React.FC = () => {
             <Book className="w-6 h-6 mr-2" style={{ color: themeColor }} />
             <h1 className="text-xl font-bold" style={{ color: themeColor }}>{t('appTitle')}</h1>
           </div>
-          <button
-            onClick={toggleLanguage}
-            className="px-3 py-1 rounded-full hover:bg-opacity-80 transition duration-300"
-            style={{ backgroundColor: `${themeColor}20`, color: themeColor }}
-          >
-            {i18n.language === 'en' ? '↑↓ 中' : '↑↓ EN'}
-          </button>
+          <div className="flex items-center">
+            <div className="flex items-center">
+              {/* 隐藏的重置领取按钮 */}
+              {false && (
+                <button
+                  onClick={handleResetClaim}
+                  className="mr-2 bg-yellow-500 text-white py-1 px-3 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 transition duration-300"
+                >
+                  {t('resetClaim')}
+                </button>
+              )}
+              <button
+                onClick={handleClaim}
+                className="mr-2 bg-green-500 text-white py-1 px-3 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-300"
+              >
+                {t('claim')}
+              </button>
+              <button
+                onClick={toggleLanguage}
+                className="px-3 py-1 rounded-full hover:bg-opacity-80 transition duration-300"
+                style={{ backgroundColor: `${themeColor}20`, color: themeColor }}
+              >
+                {i18n.language === 'en' ? '↑↓ 中' : '↑↓ EN'}
+              </button>
+            </div>
+          </div>
         </div>
         <input
           type="text"

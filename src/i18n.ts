@@ -46,7 +46,15 @@ const resources = {
       recharge: "Recharge Points",
       rechargeSuccess: "{{type}} recharged successfully, increased {{amount}} times usage",
       helpTitle: "Usage Guide",
-      pointDeduction: "Point Deduction: {{points}}"
+      pointDeduction: "Point Deduction: {{points}}",
+      claim: "Claim",
+      claimSuccess: "Successfully claimed {{type}} usage",
+      alreadyClaimed: "You have already claimed today",
+      resetClaim: "Reset Claim",
+      claimStatusReset: "Claim status has been reset",
+      errorResettingClaimStatus: "Error resetting claim status",
+      allTypes: "all types",
+      claimSuccessAll: "Congratulations! Successfully claimed usage points for all features"
     }
   },
   zh: {
@@ -85,15 +93,22 @@ const resources = {
       enAnalysis: "英文分析",
       maxRetriesReached: "达到最大重试点数",
       updateUsage: "更新{{type}}使用量",
-      rechargeTitle: "充值",
+      rechargeTitle: "充值点数",
       defaultPrice: "默认价格",
       discountPrice: "优惠价格",
       remainingUsage: "剩余点数",
       totalPrice: "总价",
-      recharge: "充值点数",
+      recharge: "充值",
       rechargeSuccess: "{{type}}充值成功，增加{{amount}}次使用点数",
       helpTitle: "点数扣除说明",
-      pointDeduction: "每次扣除点数: {{points}}"
+      pointDeduction: "每次扣除点数: {{points}}",
+      claim: "领取",
+      claimSuccess: "成功领取{{type}}使用点数",
+      alreadyClaimed: "今天已经领取过了",
+      resetClaim: "重置领取",
+      claimStatusReset: "领取状态已重置",
+      errorResettingClaimStatus: "重置领取状态时出错",
+      claimSuccessAll: "恭喜您！已成功领取所有功能点数"
     }
   }
 };

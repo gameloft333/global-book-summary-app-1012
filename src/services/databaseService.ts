@@ -1,8 +1,10 @@
 import { DailyUsage } from '../types';
+import config from '../config';
 
 interface Player {
   userId: string;
   dailyUsage: DailyUsage;
+  lastClaimDate: string | null;
 }
 
 class DatabaseService {
@@ -56,6 +58,25 @@ class DatabaseService {
     const player = this.players.get(userId);
     if (player) {
       player.dailyUsage[type] += amount;
+      this.players.set(userId, player);
+      this.saveToStorage();
+    }
+  }
+
+  async updatePlayerLastClaimDate(userId: string, date: string): Promise<void> {
+    const player = this.players.get(userId);
+    if (player) {
+      player.lastClaimDate = date;
+      this.players.set(userId, player);
+      this.saveToStorage();
+    }
+  }
+
+  // 添加重置领取状态的方法
+  async resetClaimStatus(userId: string): Promise<void> {
+    const player = this.players.get(userId);
+    if (player) {
+      player.lastClaimDate = null;
       this.players.set(userId, player);
       this.saveToStorage();
     }

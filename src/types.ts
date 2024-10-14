@@ -15,3 +15,10 @@ export interface DailyUsage {
   zhAnalysis: number;
   enAnalysis: number;
 }
+
+export interface DailyClaim {
+  zhSummary: number;
+  enSummary: number;
+  zhAnalysis: number;
+  enAnalysis: number;
+}

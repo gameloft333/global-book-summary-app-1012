@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.17] - 2023-05-30
+
+### Added
+- New daily claim feature for usage points
+- Added configuration for daily claim limits and amounts
+- Added new buttons for claiming daily usage points
+- Updated user interface to display remaining claims
+
+### Changed
+- Modified user data structure to include last claim date and remaining claims
+- Updated database service to handle new claim-related operations
+- Enhanced user service with new functions for claim operations
+
+### Fixed
+- Improved error handling for claim operations
+
 ## [0.7.16] - 2023-05-29
 
 ### Fixed
