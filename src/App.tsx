@@ -257,67 +257,74 @@ const App: React.FC = () => {
           placeholder={t('enterBookName')}
           className="w-full px-6 py-4 bg-gray-700 text-white rounded-full mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300 placeholder-gray-400"
         />
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <button
-            onClick={() => handleGenerateSummary('zh')}
-            disabled={isGeneratingZhSummary}
-            className="col-span-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-2 rounded-lg hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
-          >
-            <span className="relative z-10 text-xs">{isGeneratingZhSummary ? t('generating') : t('summaryChinese')}</span>
-            <span className="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-xs font-bold rounded-bl-lg px-1 py-0.5">
-              {getRemainingUsage('zhSummary')}
-            </span>
-            {isGeneratingZhSummary && (
-              <span className="absolute inset-0 flex items-center justify-center">
-                <span className="animate-ping absolute h-full w-full rounded-lg bg-purple-400 opacity-75"></span>
-              </span>
-            )}
-          </button>
-          <button
-            onClick={() => handleGenerateSummary('en')}
-            disabled={isGeneratingEnSummary}
-            className="col-span-1 bg-gradient-to-r from-green-500 to-teal-600 text-white py-3 px-2 rounded-lg hover:from-green-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
-          >
-            <span className="relative z-10 text-xs">{isGeneratingEnSummary ? t('generating') : t('summaryEnglish')}</span>
-            <span className="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-xs font-bold rounded-bl-lg px-1 py-0.5">
-              {getRemainingUsage('enSummary')}
-            </span>
-            {isGeneratingEnSummary && (
-              <span className="absolute inset-0 flex items-center justify-center">
-                <span className="animate-ping absolute h-full w-full rounded-lg bg-teal-400 opacity-75"></span>
-              </span>
-            )}
-          </button>
-          <button
-            onClick={() => handleGenerateAnalysis('zh')}
-            disabled={isGeneratingZhAnalysis}
-            className="col-span-1 bg-gradient-to-r from-red-500 to-pink-600 text-white py-3 px-2 rounded-lg hover:from-red-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
-          >
-            <span className="relative z-10 text-xs">{isGeneratingZhAnalysis ? t('generating') : t('analysisChinese')}</span>
-            <span className="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-xs font-bold rounded-bl-lg px-1 py-0.5">
-              {getRemainingUsage('zhAnalysis')}
-            </span>
-            {isGeneratingZhAnalysis && (
-              <span className="absolute inset-0 flex items-center justify-center">
-                <span className="animate-ping absolute h-full w-full rounded-lg bg-pink-400 opacity-75"></span>
-              </span>
-            )}
-          </button>
-          <button
-            onClick={() => handleGenerateAnalysis('en')}
-            disabled={isGeneratingEnAnalysis}
-            className="col-span-1 bg-gradient-to-r from-yellow-500 to-orange-600 text-white py-3 px-2 rounded-lg hover:from-yellow-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
-          >
-            <span className="relative z-10 text-xs">{isGeneratingEnAnalysis ? t('generating') : t('analysisEnglish')}</span>
-            <span className="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-xs font-bold rounded-bl-lg px-1 py-0.5">
-              {getRemainingUsage('enAnalysis')}
-            </span>
-            {isGeneratingEnAnalysis && (
-              <span className="absolute inset-0 flex items-center justify-center">
-                <span className="animate-ping absolute h-full w-full rounded-lg bg-orange-400 opacity-75"></span>
-              </span>
-            )}
-          </button>
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          {i18n.language === 'zh' ? (
+            <>
+              <button
+                onClick={() => handleGenerateSummary('zh')}
+                disabled={isGeneratingZhSummary}
+                className="col-span-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-2 rounded-lg hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+              >
+                <span className="relative z-10 text-xs">{isGeneratingZhSummary ? t('generating') : t('summaryChinese')}</span>
+                <span className="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-xs font-bold rounded-bl-lg px-1 py-0.5">
+                  {getRemainingUsage('zhSummary')}
+                </span>
+                {isGeneratingZhSummary && (
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <span className="animate-ping absolute h-full w-full rounded-lg bg-purple-400 opacity-75"></span>
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => handleGenerateAnalysis('zh')}
+                disabled={isGeneratingZhAnalysis}
+                className="col-span-1 bg-gradient-to-r from-red-500 to-pink-600 text-white py-3 px-2 rounded-lg hover:from-red-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+              >
+                <span className="relative z-10 text-xs">{isGeneratingZhAnalysis ? t('generating') : t('analysisChinese')}</span>
+                <span className="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-xs font-bold rounded-bl-lg px-1 py-0.5">
+                  {getRemainingUsage('zhAnalysis')}
+                </span>
+                {isGeneratingZhAnalysis && (
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <span className="animate-ping absolute h-full w-full rounded-lg bg-pink-400 opacity-75"></span>
+                  </span>
+                )}
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => handleGenerateSummary('en')}
+                disabled={isGeneratingEnSummary}
+                className="col-span-1 bg-gradient-to-r from-green-500 to-teal-600 text-white py-3 px-2 rounded-lg hover:from-green-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+              >
+                <span className="relative z-10 text-xs">{isGeneratingEnSummary ? t('generating') : t('summaryEnglish')}</span>
+                <span className="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-xs font-bold rounded-bl-lg px-1 py-0.5">
+                  {getRemainingUsage('enSummary')}
+                </span>
+                {isGeneratingEnSummary && (
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <span className="animate-ping absolute h-full w-full rounded-lg bg-teal-400 opacity-75"></span>
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => handleGenerateAnalysis('en')}
+                disabled={isGeneratingEnAnalysis}
+                className="col-span-1 bg-gradient-to-r from-yellow-500 to-orange-600 text-white py-3 px-2 rounded-lg hover:from-yellow-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+              >
+                <span className="relative z-10 text-xs">{isGeneratingEnAnalysis ? t('generating') : t('analysisEnglish')}</span>
+                <span className="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-xs font-bold rounded-bl-lg px-1 py-0.5">
+                  {getRemainingUsage('enAnalysis')}
+                </span>
+                {isGeneratingEnAnalysis && (
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <span className="animate-ping absolute h-full w-full rounded-lg bg-orange-400 opacity-75"></span>
+                  </span>
+                )}
+              </button>
+            </>
+          )}
         </div>
         {notification && (
           <div className="mb-6 p-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 rounded-lg animate-pulse">

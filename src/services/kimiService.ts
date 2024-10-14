@@ -11,7 +11,7 @@ export async function generateBookAnalysis(bookName: string, language: 'zh' | 'e
 
 Background: 您拥有丰富的阅读经验和广博的知识储备，能够敏锐地捕捉作品的核心思想和隐含主题。您善于运用多种文学理论和分析方法，将复杂的文本转化为清晰、有见地的解读。
 
-Task: 请对《${sanitizedBookName}》进行深入分析，遵循以下工作流程：
+Task: 请对《${sanitizedBookName}》进行深入分析，注意，输出时，无需输出标题部分，只需要输出每一个标题下的内容，遵循以下工作流程：
 
 1. 书籍概览（约150字）：
    - 简要介绍作者背景及其在文学界的地位
@@ -48,7 +48,7 @@ Task: 请对《${sanitizedBookName}》进行深入分析，遵循以下工作流
 
 Background: You possess rich reading experience and extensive knowledge, capable of keenly capturing the core ideas and implicit themes of works. You are adept at applying various literary theories and analytical methods to transform complex texts into clear, insightful interpretations.
 
-Task: Please provide an in-depth analysis of "${sanitizedBookName}", following this workflow:
+Task: Please conduct an in-depth analysis of "${sanitizedBookName}". Note that when outputting, there's no need to include the title sections, just output the content under each title. Follow this workflow:
 
 1. Book Overview (about 150 words):
    - Briefly introduce the author's background and their position in the literary world
