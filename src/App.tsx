@@ -226,38 +226,28 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-[600px] border-t-4" style={{ borderColor: themeColor }}>
-        <div className="flex items-center justify-between mb-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-black p-4">
+      <div className="bg-gray-800 rounded-2xl shadow-2xl p-8 w-[700px] border-t-4 border-purple-500 text-white">
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
-            <Book className="w-6 h-6 mr-2" style={{ color: themeColor }} />
-            <h1 className="text-xl font-bold" style={{ color: themeColor }}>{t('appTitle')}</h1>
+            <Book className="w-8 h-8 mr-3 text-purple-400" />
+            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+              {t('appTitle')}
+            </h1>
           </div>
-          <div className="flex items-center">
-            <div className="flex items-center">
-              {/* 隐藏的重置领取按钮 */}
-              {false && (
-                <button
-                  onClick={handleResetClaim}
-                  className="mr-2 bg-yellow-500 text-white py-1 px-3 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 transition duration-300"
-                >
-                  {t('resetClaim')}
-                </button>
-              )}
-              <button
-                onClick={handleClaim}
-                className="mr-2 bg-green-500 text-white py-1 px-3 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-300"
-              >
-                {t('claim')}
-              </button>
-              <button
-                onClick={toggleLanguage}
-                className="px-3 py-1 rounded-full hover:bg-opacity-80 transition duration-300"
-                style={{ backgroundColor: `${themeColor}20`, color: themeColor }}
-              >
-                {i18n.language === 'en' ? '↑↓ 中' : '↑↓ EN'}
-              </button>
-            </div>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleClaim}
+              className="bg-gradient-to-r from-green-400 to-blue-500 text-white py-2 px-4 rounded-full hover:from-green-500 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transform hover:scale-105 transition duration-300 ease-in-out"
+            >
+              {t('claim')}
+            </button>
+            <button
+              onClick={toggleLanguage}
+              className="bg-gray-700 text-white py-2 px-4 rounded-full hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-300 ease-in-out"
+            >
+              {i18n.language === 'en' ? '中文' : 'EN'}
+            </button>
           </div>
         </div>
         <input
@@ -265,66 +255,79 @@ const App: React.FC = () => {
           value={bookName}
           onChange={(e) => setBookName(e.target.value)}
           placeholder={t('enterBookName')}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 transition duration-300"
-          style={{ focusRingColor: themeColor }}
+          className="w-full px-6 py-4 bg-gray-700 text-white rounded-full mb-6 focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300 placeholder-gray-400"
         />
-        <div className="flex justify-between mb-4">
+        <div className="grid grid-cols-4 gap-4 mb-6">
           <button
             onClick={() => handleGenerateSummary('zh')}
             disabled={isGeneratingZhSummary}
-            className="w-[40%] text-white py-2 px-4 rounded-md hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-opacity-50 transition duration-300 relative"
-            style={{ backgroundColor: themeColor }}
+            className="col-span-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-2 rounded-lg hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
           >
-            {isGeneratingZhSummary ? t('generating') : t('summaryChinese')}
-            <span className="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+            <span className="relative z-10 text-xs">{isGeneratingZhSummary ? t('generating') : t('summaryChinese')}</span>
+            <span className="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-xs font-bold rounded-bl-lg px-1 py-0.5">
               {getRemainingUsage('zhSummary')}
             </span>
+            {isGeneratingZhSummary && (
+              <span className="absolute inset-0 flex items-center justify-center">
+                <span className="animate-ping absolute h-full w-full rounded-lg bg-purple-400 opacity-75"></span>
+              </span>
+            )}
           </button>
           <button
             onClick={() => handleGenerateSummary('en')}
             disabled={isGeneratingEnSummary}
-            className="w-[40%] text-white py-2 px-4 rounded-md hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-opacity-50 transition duration-300 relative"
-            style={{ backgroundColor: themeColor }}
+            className="col-span-1 bg-gradient-to-r from-green-500 to-teal-600 text-white py-3 px-2 rounded-lg hover:from-green-600 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
           >
-            {isGeneratingEnSummary ? t('generating') : t('summaryEnglish')}
-            <span className="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+            <span className="relative z-10 text-xs">{isGeneratingEnSummary ? t('generating') : t('summaryEnglish')}</span>
+            <span className="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-xs font-bold rounded-bl-lg px-1 py-0.5">
               {getRemainingUsage('enSummary')}
             </span>
+            {isGeneratingEnSummary && (
+              <span className="absolute inset-0 flex items-center justify-center">
+                <span className="animate-ping absolute h-full w-full rounded-lg bg-teal-400 opacity-75"></span>
+              </span>
+            )}
           </button>
-        </div>
-        <div className="flex justify-between mb-4">
           <button
             onClick={() => handleGenerateAnalysis('zh')}
             disabled={isGeneratingZhAnalysis}
-            className="w-[40%] text-white py-2 px-4 rounded-md hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-opacity-50 transition duration-300 relative"
-            style={{ backgroundColor: themeColor }}
+            className="col-span-1 bg-gradient-to-r from-red-500 to-pink-600 text-white py-3 px-2 rounded-lg hover:from-red-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
           >
-            {isGeneratingZhAnalysis ? t('generating') : t('analysisChinese')}
-            <span className="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+            <span className="relative z-10 text-xs">{isGeneratingZhAnalysis ? t('generating') : t('analysisChinese')}</span>
+            <span className="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-xs font-bold rounded-bl-lg px-1 py-0.5">
               {getRemainingUsage('zhAnalysis')}
             </span>
+            {isGeneratingZhAnalysis && (
+              <span className="absolute inset-0 flex items-center justify-center">
+                <span className="animate-ping absolute h-full w-full rounded-lg bg-pink-400 opacity-75"></span>
+              </span>
+            )}
           </button>
           <button
             onClick={() => handleGenerateAnalysis('en')}
             disabled={isGeneratingEnAnalysis}
-            className="w-[40%] text-white py-2 px-4 rounded-md hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-opacity-50 transition duration-300 relative"
-            style={{ backgroundColor: themeColor }}
+            className="col-span-1 bg-gradient-to-r from-yellow-500 to-orange-600 text-white py-3 px-2 rounded-lg hover:from-yellow-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
           >
-            {isGeneratingEnAnalysis ? t('generating') : t('analysisEnglish')}
-            <span className="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+            <span className="relative z-10 text-xs">{isGeneratingEnAnalysis ? t('generating') : t('analysisEnglish')}</span>
+            <span className="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-xs font-bold rounded-bl-lg px-1 py-0.5">
               {getRemainingUsage('enAnalysis')}
             </span>
+            {isGeneratingEnAnalysis && (
+              <span className="absolute inset-0 flex items-center justify-center">
+                <span className="animate-ping absolute h-full w-full rounded-lg bg-orange-400 opacity-75"></span>
+              </span>
+            )}
           </button>
         </div>
         {notification && (
-          <div className="mb-4 p-2 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+          <div className="mb-6 p-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 rounded-lg animate-pulse">
             {notification}
           </div>
         )}
         {summary && (
-          <div className="mt-6 p-4 rounded-lg relative" style={{ backgroundColor: `${themeColor}10` }}>
-            <h2 className="text-lg font-semibold mb-2" style={{ color: themeColor }}>{t('result')}</h2>
-            <p className="text-gray-700 whitespace-pre-wrap mb-4">{summary}</p>
+          <div className="mt-8 p-6 rounded-lg relative bg-gradient-to-br from-gray-700 to-gray-800 shadow-inner">
+            <h2 className="text-2xl font-semibold mb-4 text-purple-400">{t('result')}</h2>
+            <p className="text-gray-300 whitespace-pre-wrap mb-4">{summary}</p>
             <div 
               className="absolute" 
               style={{
@@ -336,29 +339,30 @@ const App: React.FC = () => {
               <QRCode 
                 value={config.qrCode.link || qrValue} 
                 size={config.qrCode.size} 
-                fgColor={themeColor}
+                fgColor="#8B5CF6"
+                bgColor="transparent"
               />
             </div>
           </div>
         )}
-        <div className="mt-4 flex justify-between items-center">
+        <div className="mt-8 flex justify-between items-center">
           <button
             onClick={handleAdminPanelToggle}
-            className="text-gray-500 hover:text-gray-700 transition duration-300"
+            className="text-gray-400 hover:text-purple-400 transition duration-300"
           >
-            <Settings className="w-5 h-5" />
+            <Settings className="w-6 h-6" />
           </button>
           <button
             onClick={() => setShowRechargeModal(true)}
-            className="text-gray-500 hover:text-gray-700 transition duration-300 ml-2"
+            className="text-gray-400 hover:text-green-400 transition duration-300 ml-2"
           >
-            <CreditCard className="w-5 h-5" />
+            <CreditCard className="w-6 h-6" />
           </button>
           <button
             onClick={() => setShowHelpModal(true)}
-            className="text-gray-500 hover:text-gray-700 transition duration-300 ml-2"
+            className="text-gray-400 hover:text-blue-400 transition duration-300 ml-2"
           >
-            <HelpCircle className="w-5 h-5" />
+            <HelpCircle className="w-6 h-6" />
           </button>
           <div 
             className="text-gray-500"

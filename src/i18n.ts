@@ -104,7 +104,7 @@ const resources = {
       pointDeduction: "每次扣除点数: {{points}}",
       claim: "领取",
       claimSuccess: "成功领取{{type}}使用点数",
-      alreadyClaimed: "今天已经领取过了",
+      alreadyClaimed: "今天已经领取过了，明天再来啦~",
       resetClaim: "重置领取",
       claimStatusReset: "领取状态已重置",
       errorResettingClaimStatus: "重置领取状态时出错",
