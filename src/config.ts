@@ -52,17 +52,17 @@ const config = {
   },
   // 每天可领取次数
   dailyClaimLimits: {
-    zhSummary: 4,
-    enSummary: 3,
-    zhAnalysis: 2,
-    enAnalysis: 1
-  },
-  // 每次可领取点数
-  dailyClaimAmount: {
     zhSummary: 1,
     enSummary: 1,
     zhAnalysis: 1,
     enAnalysis: 1
+  },
+  // 每次可领取点数
+  dailyClaimAmount: {
+    zhSummary: 2,
+    enSummary: 2,
+    zhAnalysis: 2,
+    enAnalysis: 2
   },
 };
 

@@ -12,6 +12,8 @@ import AdminPanel from './components/AdminPanel';
 import { getUserData, updateUserUsage, rechargeUserUsage, claimDailyUsage, resetClaimStatus } from './services/userService';
 import RechargeModal from './components/RechargeModal';
 import HelpModal from './components/HelpModal';
+import ImageGallery from './components/ImageGallery';
+import RandomQuote from './components/RandomQuote';
 
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -39,6 +41,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [notification, setNotification] = useState<string | null>(null);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [hasClaimed, setHasClaimed] = useState(false);
 
   useEffect(() => {
     const initializeUser = async () => {
@@ -83,6 +86,20 @@ const App: React.FC = () => {
     };
 
     fetchLatestUserData();
+  }, [userId]);
+
+  useEffect(() => {
+    const checkClaimStatus = async () => {
+      if (!userId) return;
+      try {
+        const userData = await getUserData(userId);
+        setHasClaimed(userData.hasClaimed || false);
+      } catch (error) {
+        console.error('Error checking claim status:', error);
+      }
+    };
+    
+    checkClaimStatus();
   }, [userId]);
 
   const getRandomColor = () => {
@@ -194,12 +211,15 @@ const App: React.FC = () => {
       await claimDailyUsage(userId);
       const updatedUserData = await getUserData(userId);
       setDailyUsage(updatedUserData.remainingUsage);
-      // const claimedTypes = Object.keys(config.dailyClaimAmount).map(type => t(type)).join(', ');
-      // setNotification(t('claimSuccess', { type: claimedTypes }));
       setNotification(t('claimSuccessAll'));
     } catch (error) {
+      console.error('Error claiming points:', error);
+      // 修改这里的错误处理逻辑
       if (error instanceof Error) {
         setNotification(error.message);
+        if (error.message.includes('already claimed')) {
+          setHasClaimed(true);
+        }
       } else {
         setNotification(t('unknownError'));
       }
@@ -238,7 +258,15 @@ const App: React.FC = () => {
           <div className="flex items-center space-x-4">
             <button
               onClick={handleClaim}
-              className="bg-gradient-to-r from-green-400 to-blue-500 text-white py-2 px-4 rounded-full hover:from-green-500 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transform hover:scale-105 transition duration-300 ease-in-out"
+              disabled={hasClaimed}
+              className={`
+                py-2 px-4 rounded-full transition duration-300 ease-in-out transform
+                ${hasClaimed 
+                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-green-400 to-blue-500 text-white hover:from-green-500 hover:to-blue-600 hover:scale-105'
+                }
+                focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50
+              `}
             >
               {t('claim')}
             </button>
@@ -380,6 +408,21 @@ const App: React.FC = () => {
           >
             ID: {userId}
           </div>
+        </div>
+        <div className="space-y-12 mt-12">
+            <div className="relative">
+                <h2 className="text-xl font-semibold text-purple-400 mb-4 pl-4 border-l-4 border-purple-500">
+                    {t('featuredImage')}
+                </h2>
+                <ImageGallery />
+            </div>
+            
+            <div className="relative">
+                <h2 className="text-xl font-semibold text-purple-400 mb-4 pl-4 border-l-4 border-purple-500">
+                    {t('dailyQuote')}
+                </h2>
+                <RandomQuote />
+            </div>
         </div>
       </div>
       <PaymentModal

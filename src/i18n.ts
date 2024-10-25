@@ -54,7 +54,9 @@ const resources = {
       claimStatusReset: "Claim status has been reset",
       errorResettingClaimStatus: "Error resetting claim status",
       allTypes: "all types",
-      claimSuccessAll: "Congratulations! Successfully claimed usage points for all features"
+      claimSuccessAll: "Congratulations! Successfully claimed usage points for all features",
+      dailyQuote: "Quote of the Day",
+      featuredImage: "Featured Image",
     }
   },
   zh: {
@@ -108,7 +110,9 @@ const resources = {
       resetClaim: "重置领取",
       claimStatusReset: "领取状态已重置",
       errorResettingClaimStatus: "重置领取状态时出错",
-      claimSuccessAll: "恭喜您！已成功领取所有功能点数"
+      claimSuccessAll: "恭喜您！已成功领取所有功能点数",
+      dailyQuote: "今日格言",
+      featuredImage: "精选图片",
     }
   }
 };
