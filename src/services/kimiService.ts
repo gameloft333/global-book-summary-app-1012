@@ -3,6 +3,10 @@ import i18next from 'i18next';
 const API_KEY = import.meta.env.VITE_KIMI_API_KEY;
 const API_URL = 'https://api.moonshot.cn/v1/chat/completions';
 
+// 添加 Gemini API 的常量
+const BACKUP_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const BACKUP_API_URL = '/api/gemini';
+
 export async function generateBookAnalysis(bookName: string, language: 'zh' | 'en'): Promise<string> {
   const sanitizedBookName = bookName.replace(/[·:：]/g, ' ').trim();
 
@@ -87,6 +91,7 @@ Please use clear and concise language for the analysis, ensuring the content is 
 
   while (retries < maxRetries) {
     try {
+      // 尝试使用 Kimi API
       if (!API_KEY) {
         throw new Error('API key is missing');
       }
@@ -133,17 +138,12 @@ Please use clear and concise language for the analysis, ensuring the content is 
 
       return text;
     } catch (error) {
-      if (retries === maxRetries - 1) {
-        console.error('Error in generateBookAnalysis:', error);
-        if (error instanceof Error) {
-          throw new Error(i18next.t('failedToGenerateAnalysis') + ': ' + error.message);
-        } else {
-          throw new Error(i18next.t('failedToGenerateAnalysis') + ': ' + i18next.t('unknownError'));
-        }
+      if (retries < maxRetries - 1) {
+        retries++;
+        continue;
       }
-      retries++;
+
+      throw new Error(i18next.t('failedToGenerateAnalysis') + ': ' + i18next.t('maxRetriesReached'));
     }
   }
-
-  throw new Error(i18next.t('failedToGenerateAnalysis') + ': ' + i18next.t('maxRetriesReached'));
 }

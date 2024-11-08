@@ -1,5 +1,7 @@
 import { PaymentMethod } from './types';
 
+type ApiProvider = 'gemini' | 'kimi';
+
 const config = {
   qrCode: {
     size: 120,
@@ -64,6 +66,20 @@ const config = {
     zhAnalysis: 2,
     enAnalysis: 2
   },
+  // 添加 API 服务配置
+  apiServices: {
+    summary: {
+      preferredProvider: 'kimi' as ApiProvider,    // 摘要优先使用 Kimi
+      retryCount: 3,                               // 可选：添加重试次数配置
+      useBackup: false,    // 添加此配置禁用备用服务
+    },
+    analysis: {
+      preferredProvider: 'kimi' as ApiProvider,  // 分析优先使用 kimi
+      retryCount: 3,                               // 可选：添加重试次数配置
+      useBackup: false,    // 添加此配置禁用备用服务
+    }
+  },
 };
 
+export type { ApiProvider };  // 导出类型定义
 export default config;

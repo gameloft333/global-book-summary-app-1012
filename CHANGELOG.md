@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.23] - 2024-03-XX
+
+### Fixed
+- 修复了摘要生成功能错误调用分析API的问题
+- 修复了 fallbackService 中的服务选择逻辑
+- 正确导入和使用 generateBookSummaryBackup 函数
+
+### Changed
+- 优化了服务调用逻辑，确保摘要和分析功能使用正确的API
+- 完善了错误处理机制
+
+## [0.11.21] - 2024-03-XX
+
+### Added
+- Added fallback service functionality for API calls
+- Implemented automatic service switching when primary service fails
+- Created new fallbackService.ts to handle service redundancy
+
+### Changed
+- Modified handleGenerateSummary and handleGenerateAnalysis to use fallback service
+- Updated error handling to attempt fallback before showing error to user
+
+### Improved
+- Enhanced system reliability through service redundancy
+- Better error handling and recovery mechanisms
+
 ## [0.8.17] - 2023-05-30
 
 ### Added

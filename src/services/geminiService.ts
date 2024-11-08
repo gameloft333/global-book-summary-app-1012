@@ -1,7 +1,11 @@
 import i18next from 'i18next';
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const API_URL = '/api/gemini';
+
+// 添加 Kimi API 的常量
+const BACKUP_API_KEY = import.meta.env.VITE_KIMI_API_KEY;
+const BACKUP_API_URL = 'https://api.moonshot.cn/v1/chat/completions';
 
 export async function generateBookSummary(bookName: string, language: 'zh' | 'en'): Promise<string> {
   const sanitizedBookName = bookName.replace(/[·:：]/g, ' ').trim();
@@ -71,14 +75,17 @@ ${language === 'zh' ? `请注意：
 
   try {
     if (!API_KEY) {
-      throw new Error('API key is missing');
+      throw new Error('API密钥缺失');
     }
 
     const response = await fetch(`${API_URL}?key=${API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Origin': window.location.origin,
+        'Access-Control-Allow-Origin': '*'
       },
+      mode: 'cors',
       body: JSON.stringify({
         contents: [{ parts: [{ text: basePrompt }] }],
         generationConfig: {
@@ -91,24 +98,32 @@ ${language === 'zh' ? `请注意：
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('API Error:', errorData);
-      throw new Error(`API error: ${errorData.error?.message || 'Unknown error'}`);
+      const errorText = await response.text();
+      let errorMessage = '未知错误';
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.error?.message || errorText;
+      } catch (e) {
+        errorMessage = errorText;
+      }
+      console.error('API Error:', errorMessage);
+      throw new Error(`API错误: ${errorMessage}`);
     }
 
-    const data = await response.json();
-    console.log('API Response:', JSON.stringify(data, null, 2));
+    try {
+      const data = await response.json();
+      console.log('API Response:', JSON.stringify(data, null, 2));
 
-    if (!data.candidates || !Array.isArray(data.candidates) || data.candidates.length === 0) {
-      console.error('No candidates in response:', data);
-      throw new Error('No candidates in response');
-    }
+      if (!data.candidates || !Array.isArray(data.candidates) || data.candidates.length === 0) {
+        console.error('No candidates in response:', data);
+        throw new Error('API响应中没有候选结果');
+      }
 
-    const candidate = data.candidates[0];
-    if (!candidate.content || !candidate.content.parts || !Array.isArray(candidate.content.parts) || candidate.content.parts.length === 0) {
-      console.error('Invalid candidate format:', candidate);
-      throw new Error('Invalid candidate format');
-    }
+      const candidate = data.candidates[0];
+      if (!candidate.content || !candidate.content.parts || !Array.isArray(candidate.content.parts) || candidate.content.parts.length === 0) {
+        console.error('Invalid candidate format:', candidate);
+        throw new Error('API响应格式无效');
+      }
 
     const text = candidate.content.parts[0].text;
     if (typeof text !== 'string') {
@@ -125,13 +140,16 @@ ${language === 'zh' ? `请注意：
       throw new Error(i18next.t('failedToGenerateSummary') + ': ' + i18next.t('responseFormatMismatch'));
     }
 
-    return text;
-  } catch (error) {
-    console.error('Error in generateBookSummary:', error);
-    if (error instanceof Error) {
-      throw new Error(i18next.t('failedToGenerateSummary') + ': ' + error.message);
-    } else {
-      throw new Error(i18next.t('failedToGenerateSummary') + ': ' + i18next.t('unknownError'));
+      return text;
+    } catch (error) {
+      console.error('JSON parsing error:', error);
+      throw new Error(`解析API响应失败: ${error instanceof Error ? error.message : '未知错误'}`);
     }
+  } catch (error) {
+    console.error('API Error:', error);
+    // 尝试使用备用 API
+    throw new Error(error instanceof Error ? error.message : '未知错误');
   }
+  
+  return '';  // 确保函数始终有返回值
 }

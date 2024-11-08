@@ -14,6 +14,7 @@ import RechargeModal from './components/RechargeModal';
 import HelpModal from './components/HelpModal';
 import ImageGallery from './components/ImageGallery';
 import RandomQuote from './components/RandomQuote';
+import { generateWithFallback } from './services/fallbackService';
 
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -123,7 +124,7 @@ const App: React.FC = () => {
     setIsGeneratingEnSummary(lang === 'en');
     setLanguage(lang);
     try {
-      const result = await generateBookSummary(bookName, lang);
+      const result = await generateWithFallback(bookName, lang, 'summary');
       setSummary(result);
       setQrValue(result);
       await updateUserUsage(userId!, usageType, pointsToDeduct);
@@ -154,7 +155,7 @@ const App: React.FC = () => {
     setIsGeneratingEnAnalysis(lang === 'en');
     setLanguage(lang);
     try {
-      const result = await generateBookAnalysis(bookName, lang);
+      const result = await generateWithFallback(bookName, lang, 'analysis');
       setSummary(result);
       setQrValue(result);
       await updateUserUsage(userId!, usageType, pointsToDeduct);
